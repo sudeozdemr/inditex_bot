@@ -1,15 +1,16 @@
 import requests
 
+from deep_translator import GoogleTranslator
 from bs4 import BeautifulSoup
 from telegram import Update 
 from telegram.ext import MessageHandler, Updater, CommandHandler, Application, filters, ContextTypes
+from appium import webdriver
 
 
-#Fonksions
+#Functions
 async def keyboardinfo (update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     #TODO Gelen mesajı fonksiyon içine almadan değişkende tut
     user_url = update.message.text 
-
     headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:133.0) Gecko/20100101 Firefox/133.0"}
 
     #Siteye istek at
@@ -19,17 +20,31 @@ async def keyboardinfo (update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     #HTML içeriğini ayrıştır
     soup = BeautifulSoup(response.content, 'html.parser')
 
-    if "zara.com/tr" in user_url:
+    if "mobile" in user_url:
+        #app_url_for_scrap = soup.find('meta', property='og:url')
+        app_title = soup.find("h1").get_text()
+
+        translator = GoogleTranslator(source='auto', target='tr')
+        app_title = translator.translate(app_title)
+
+        await update.message.reply_text(f"{app_title}")
+    
+    else:
         titles = soup.find("h1", class_ ="product-detail-info__header-name" ).get_text()
         price = soup.find("span", class_ = "money-amount__main").get_text()
         reference_number = soup.find("button", class_="product-color-extended-name__copy-action").get_text()
-    else :
-        titles = soup.find("h1", class_ ="product-detail-info__header-name")
-        price = soup.find("span", class_ = "money-amount__main")
-        reference_number = soup.find("button", class_="product-color-extended-name__copy-action")
+        html_img = soup.find_all("img", class_ = "media-image__image media__wrapper--media") 
+        
+        for image in html_img:
+            img_url = image['src']
+            img_data = requests.get(img_url).content
+            with open('image.jpg', 'wb') as handler:
+                handler.write(img_data)
 
-    await update.message.reply_text(f"Title: {titles} \nPrice: {price} \nReference number: {reference_number}")
 
+        await update.message.reply_text(f"Title: {titles} \nPrice: {price} \nReference number: {reference_number} \n")
+
+    
 
 #CommandHandler 
 
