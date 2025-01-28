@@ -1,10 +1,15 @@
+#Sude OZDEMIR
+
 import requests
 
+import pandas as pd
 from deep_translator import GoogleTranslator
 from bs4 import BeautifulSoup
 from telegram import Update 
 from telegram.ext import MessageHandler, Updater, CommandHandler, Application, filters, ContextTypes
-from appium import webdriver
+from selenium import webdriver
+from selenium.webdriver import ChromeOptions
+
 
 
 #Functions
@@ -33,13 +38,19 @@ async def keyboardinfo (update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         titles = soup.find("h1", class_ ="product-detail-info__header-name" ).get_text()
         price = soup.find("span", class_ = "money-amount__main").get_text()
         reference_number = soup.find("button", class_="product-color-extended-name__copy-action").get_text()
-        html_img = soup.find_all("img", class_ = "media-image__image media__wrapper--media") 
         
-        for image in html_img:
-            img_url = image['src']
-            img_data = requests.get(img_url).content
-            with open('image.jpg', 'wb') as handler:
-                handler.write(img_data)
+        """driver = webdriver.Chrome()
+        driver.get(user_url)
+        results = []
+        content = driver.page_source
+        soup = BeautifulSoup(content, 'html.parser')
+
+        options = ChromeOptions()
+        options.add_argument("--headless")
+        driver = webdriver.Chrome(options=options)
+
+        service = webdriver.ChromeService(executable_path='/path/to/driver')
+        driver = webdriver.Chrome(service=service)"""
 
 
         await update.message.reply_text(f"Title: {titles} \nPrice: {price} \nReference number: {reference_number} \n")

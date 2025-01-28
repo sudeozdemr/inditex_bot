@@ -15,8 +15,13 @@ driver.get('https://www.zara.com/tr/tr/yumusak-dokulu-oversize-kaban-p03046037.h
 
 # Sayfadaki başlığı çek
 title = driver.find_element(By.CSS_SELECTOR, 'h1').text
-print(title)
+reference_number = driver.find_element(By.CSS_SELECTOR, 'button.product-color-extended-name__copy-action').text
+price = driver.find_element(By.CSS_SELECTOR, 'span.money-amount__main').text
+images = driver.find_elements(By.CSS_SELECTOR, 'img.product-image__image')
 
+print(title)
+print(reference_number)
+price(price)
 
 # Tarayıcıyı kapat
 driver.quit()
