@@ -24,7 +24,7 @@ service = Service(gecko_driver_path)
 driver = webdriver.Firefox(service=service)
 
 # Hedef web sayfasına git
-driver.get('https://www.zara.com/tr/tr/yumusak-fermuarli-ceket-p03046287.html?v1=423154979')
+driver.get('https://www.zara.com/tr/tr/z1975-straight-leg-high-waist-jean-p06164059.html?v1=437181794&v2=2419185')
 
 time.sleep(2)
 
@@ -36,14 +36,17 @@ price = driver.find_element(By.CSS_SELECTOR, 'span.money-amount__main').text
 # CSS ile görüntüyü bul
 image_elements = driver.find_elements(By.CSS_SELECTOR, "div.media__wrapper img.media-image__image")
 if image_elements:
-    image_url = image_elements[0].get_attribute("src")  # İlk resmi al
-    image_data = requests.get(image_url).content
-    with open ("scraped-image.jpg", "wb") as image_file:
-        image_file.write(image_data)
-    print("Görsel kaydedildi.")
+    for product_images in image_elements:
+        image_url = product_images.get_attribute("src")
+        image_data = requests.get(image_url).content
+        file_path_for_images = "/Users/sudeozdemir/Desktop/inditex_bot/images"
+        image_name = os.path.splitext(os.path.basename(image_url))[0] + ".jpeg"
+        save_path = os.path.join(file_path_for_images, image_name)
+        with open (save_path, "wb") as image_file:
+            image_file.write(image_data)
+        print("Görsel kaydedildi.")
 else:
     print("Görsel bulunamadı.")
-
 
 # Tarayıcıyı kapat
 driver.quit()
